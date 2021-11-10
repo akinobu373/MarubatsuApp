@@ -14,7 +14,6 @@ class ViewController: UIViewController {
     var currentQuestionNum: Int = 0
     var questions: [[String:Any]] = []
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         let userDefaults = UserDefaults.standard
