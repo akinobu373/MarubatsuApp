@@ -12,28 +12,24 @@ class ViewController: UIViewController {
     @IBOutlet weak var questionLabel: UILabel!
     
     var currentQuestionNum: Int = 0
-    
-    let questions: [[String:Any]] = [
-        
-        [
-            "question": "iPhoneアプリを開発する統合環境はZcodeである",
-            "answer": false
-        ],
-        [
-            "question": "Xcode画面の右側にはユーティリティーズがある",
-            "answer": true
-        ],
-        [
-            "question": "UILabelは文字列を表示する際に利用する",
-            "answer": true
-        ]
-    ]
-    
+    var questions: [[String:Any]] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        let userDefaults = UserDefaults.standard
+        if userDefaults.object(forKey: "questions") != nil{
+            questions = userDefaults.object(forKey: "questions") as! [[String: Any]]
+        }
         showQuestion()
-        // Do any additional setup after loading the view.
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        questions = []
+        let userDefaults = UserDefaults.standard
+        if userDefaults.object(forKey: "questions") != nil{
+            questions = userDefaults.object(forKey: "questions") as![[String: Any]]
+        }
+        showQuestion()
     }
     
     @IBAction func tappedNoButton(_ sender: Any) {
@@ -45,37 +41,42 @@ class ViewController: UIViewController {
     }
     
     func showQuestion(){
-        let question = questions[currentQuestionNum]
-        
-        if let que = question["question"] as? String{
-            questionLabel.text = que
+        if questions.isEmpty == true {
+            questionLabel.text = "問題がありません、問題を作りましょう！"
+        } else {
+            let question = questions[currentQuestionNum]
+            
+            if let que = question["question"] as? String {
+                questionLabel.text = que
+            }
         }
     }
     
+    
     func checkAnswer(yourAnswer: Bool){
-        let question = questions[currentQuestionNum]
-        
-        if let ans = question["answer"] as? Bool{
-            if yourAnswer == ans {
-                //正解->currentQuestionNum+1して次の問題へ
-                
-                currentQuestionNum += 1
-                showAlert(message: "正解！")
-            }else{
-                //不正解
-                showAlert(message: "不正解...")
+        if questions.isEmpty == true {
+            
+        } else {
+            let question = questions[currentQuestionNum]
+            
+            if let ans = question["answer"] as? Bool {
+                if yourAnswer == ans {
+                    currentQuestionNum += 1
+                    showAlert(message: "正解！")
+                } else {
+                    showAlert(message: "不正解…")
+                }
+            } else {
+                print("答えが入ってません")
+                return
             }
-        }else{
-            print("答えが入っていません")
-            return
+            
+            if currentQuestionNum >= questions.count {
+                currentQuestionNum = 0
+            }
+            
+            showQuestion()
         }
-        
-        if currentQuestionNum >= questions.count {
-            currentQuestionNum = 0
-        }
-        
-        showQuestion() //正解の時は次の問題を表示
-        //不正解の時は同じ問題を表示
     }
     
     func showAlert(message: String){
